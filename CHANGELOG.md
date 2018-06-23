@@ -1,6 +1,355 @@
 CHANGELOG
 =========
 
+0.17.4
+------
+
+- Added `--layout` option with a new layout called `reverse-list`.
+    - `--layout=reverse` is a synonym for `--reverse`
+    - `--layout=default` is a synonym for `--no-reverse`
+- Preview window will be updated even when there is no match for the query
+  if any of the placeholder expressions (e.g. `{q}`, `{+}`) evaluates to
+  a non-empty string.
+- More keys for binding: `shift-{up,down}`, `alt-{up,down,left,right}`
+- fzf can now start even when `/dev/tty` is not available by making an
+  educated guess.
+- Updated the default command for Windows.
+- Fixes and improvements on bash/zsh completion
+- install and uninstall scripts now supports generating files under
+  `XDG_CONFIG_HOME` on `--xdg` flag.
+
+See https://github.com/junegunn/fzf/milestone/12?closed=1 for the full list of
+changes.
+
+0.17.3
+------
+- `$LINES` and `$COLUMNS` are exported to preview command so that the command
+  knows the exact size of the preview window.
+- Better error messages when the default command or `$FZF_DEFAULT_COMMAND`
+  fails.
+- Reverted #1061 to avoid having duplicate entries in the list when find
+  command detected a file system loop (#1120). The default command now
+  requires that find supports `-fstype` option.
+- fzf now distinguishes mouse left click and right click (#1130)
+    - Right click is now bound to `toggle` action by default
+    - `--bind` understands `left-click` and `right-click`
+- Added `replace-query` action (#1137)
+    - Replaces query string with the current selection
+- Added `accept-non-empty` action (#1162)
+    - Same as accept, except that it prevents fzf from exiting without any
+      selection
+
+0.17.1
+------
+
+- Fixed custom background color of preview window (#1046)
+- Fixed background color issues of Windows binary
+- Fixed Windows binary to execute command using cmd.exe with no parsing and
+  escaping (#1072)
+- Added support for `window` layout on Vim 8 using Vim 8 terminal (#1055)
+
+0.17.0-2
+--------
+
+A maintenance release for auxiliary scripts. fzf binaries are not updated.
+
+- Experimental support for the builtin terminal of Vim 8
+    - fzf can now run inside GVim
+- Updated Vim plugin to better handle `&shell` issue on fish
+- Fixed a bug of fzf-tmux where invalid output is generated
+- Fixed fzf-tmux to work even when `tput` does not work
+
+0.17.0
+------
+- Performance optimization
+- One can match literal spaces in extended-search mode with a space prepended
+  by a backslash.
+- `--expect` is now additive and can be specified multiple times.
+
+0.16.11
+-------
+- Performance optimization
+- Fixed missing preview update
+
+0.16.10
+-------
+- Fixed invalid handling of ANSI colors in preview window
+- Further improved `--ansi` performance
+
+0.16.9
+------
+- Memory and performance optimization
+    - Around 20% performance improvement for general use cases
+    - Up to 5x faster processing of `--ansi`
+    - Up to 50% reduction of memory usage
+- Bug fixes and usability improvements
+    - Fixed handling of bracketed paste mode
+    - [ERROR] on info line when the default command failed
+    - More efficient rendering of preview window
+    - `--no-clear` updated for repetitive relaunching scenarios
+
+0.16.8
+------
+- New `change` event and `top` action for `--bind`
+    - `fzf --bind change:top`
+        - Move cursor to the top result whenever the query string is changed
+    - `fzf --bind 'ctrl-w:unix-word-rubout+top,ctrl-u:unix-line-discard+top'`
+        - `top` combined with `unix-word-rubout` and `unix-line-discard`
+- Fixed inconsistent tiebreak scores when `--nth` is used
+- Proper display of tab characters in `--prompt`
+- Fixed not to `--cycle` on page-up/page-down to prevent overshoot
+- Git revision in `--version` output
+- Basic support for Cygwin environment
+- Many fixes in Vim plugin on Windows/Cygwin (thanks to @janlazo)
+
+0.16.7
+------
+- Added support for `ctrl-alt-[a-z]` key chords
+- CTRL-Z (SIGSTOP) now works with fzf
+- fzf will export `$FZF_PREVIEW_WINDOW` so that the scripts can use it
+- Bug fixes and improvements in Vim plugin and shell extensions
+
+0.16.6
+------
+- Minor bug fixes and improvements
+- Added `--no-clear` option for scripting purposes
+
+0.16.5
+------
+- Minor bug fixes
+- Added `toggle-preview-wrap` action
+- Built with Go 1.8
+
+0.16.4
+------
+- Added `--border` option to draw border above and below the finder
+- Bug fixes and improvements
+
+0.16.3
+------
+- Fixed a bug where fzf incorrectly display the lines when straddling tab
+  characters are trimmed
+- Placeholder expression used in `--preview` and `execute` action can
+  optionally take `+` flag to be used with multiple selections
+    - e.g. `git log --oneline | fzf --multi --preview 'git show {+1}'`
+- Added `execute-silent` action for executing a command silently without
+  switching to the alternate screen. This is useful when the process is
+  short-lived and you're not interested in its output.
+    - e.g. `fzf --bind 'ctrl-y:execute!(echo -n {} | pbcopy)'`
+- `ctrl-space` is allowed in `--bind`
+
+0.16.2
+------
+- Dropped ncurses dependency
+- Binaries for freebsd, openbsd, arm5, arm6, arm7, and arm8
+- Official 24-bit color support
+- Added support for composite actions in `--bind`. Multiple actions can be
+  chained using `+` separator.
+    - e.g. `fzf --bind 'ctrl-y:execute(echo -n {} | pbcopy)+abort'`
+- `--preview-window` with size 0 is allowed. This is used to make fzf execute
+  preview command in the background without displaying the result.
+- Minor bug fixes and improvements
+
+0.16.1
+------
+- Fixed `--height` option to properly fill the window with the background
+  color
+- Added `half-page-up` and `half-page-down` actions
+- Added `-L` flag to the default find command
+
+0.16.0
+------
+- *Added `--height HEIGHT[%]` option*
+    - fzf can now display finder without occupying the full screen
+- Preview window will truncate long lines by default. Line wrap can be enabled
+  by `:wrap` flag in `--preview-window`.
+- Latin script letters will be normalized before matching so that it's easier
+  to match against accented letters. e.g. `sodanco` can match `Só Danço Samba`.
+    - Normalization can be disabled via `--literal`
+- Added `--filepath-word` to make word-wise movements/actions (`alt-b`,
+  `alt-f`, `alt-bs`, `alt-d`) respect path separators
+
+0.15.9
+------
+- Fixed rendering glitches introduced in 0.15.8
+- The default escape delay is reduced to 50ms and is configurable via
+  `$ESCDELAY`
+- Scroll indicator at the top-right corner of the preview window is always
+  displayed when there's overflow
+- Can now be built with ncurses 6 or tcell to support extra features
+    - *ncurses 6*
+        - Supports more than 256 color pairs
+        - Supports italics
+    - *tcell*
+        - 24-bit color support
+    - See https://github.com/junegunn/fzf/blob/master/BUILD.md
+
+0.15.8
+------
+- Updated ANSI processor to handle more VT-100 escape sequences
+- Added `--no-bold` (and `--bold`) option
+- Improved escape sequence processing for WSL
+- Added support for `alt-[0-9]`, `f11`, and `f12` for `--bind` and `--expect`
+
+0.15.7
+------
+- Fixed panic when color is disabled and header lines contain ANSI colors
+
+0.15.6
+------
+- Windows binaries! (@kelleyma49)
+- Fixed the bug where header lines are cleared when preview window is toggled
+- Fixed not to display ^N and ^O on screen
+- Fixed cursor keys (or any key sequence that starts with ESC) on WSL by
+  making fzf wait for additional keystrokes after ESC for up to 100ms
+
+0.15.5
+------
+- Setting foreground color will no longer set background color to black
+    - e.g. `fzf --color fg:153`
+- `--tiebreak=end` will consider relative position instead of absolute distance
+- Updated `fzf#wrap` function to respect `g:fzf_colors`
+
+0.15.4
+------
+- Added support for range expression in preview and execute action
+    - e.g. `ls -l | fzf --preview="echo user={3} when={-4..-2}; cat {-1}" --header-lines=1`
+    - `{q}` will be replaced to the single-quoted string of the current query
+- Fixed to properly handle unicode whitespace characters
+- Display scroll indicator in preview window
+- Inverse search term will use exact matcher by default
+    - This is a breaking change, but I believe it makes much more sense. It is
+      almost impossible to predict which entries will be filtered out due to
+      a fuzzy inverse term. You can still perform inverse-fuzzy-match by
+      prepending `!'` to the term.
+
+0.15.3
+------
+- Added support for more ANSI attributes: dim, underline, blink, and reverse
+- Fixed race condition in `toggle-preview`
+
+0.15.2
+------
+- Preview window is now scrollable
+    - With mouse scroll or with bindable actions
+        - `preview-up`
+        - `preview-down`
+        - `preview-page-up`
+        - `preview-page-down`
+- Updated ANSI processor to support high intensity colors and ignore
+  some VT100-related escape sequences
+
+0.15.1
+------
+- Fixed panic when the pattern occurs after 2^15-th column
+- Fixed rendering delay when displaying extremely long lines
+
+0.15.0
+------
+- Improved fuzzy search algorithm
+    - Added `--algo=[v1|v2]` option so one can still choose the old algorithm
+      which values the search performance over the quality of the result
+- Advanced scoring criteria
+- `--read0` to read input delimited by ASCII NUL character
+- `--print0` to print output delimited by ASCII NUL character
+
+0.13.5
+------
+- Memory and performance optimization
+    - Up to 2x performance with half the amount of memory
+
+0.13.4
+------
+- Performance optimization
+    - Memory footprint for ascii string is reduced by 60%
+    - 15 to 20% improvement of query performance
+    - Up to 45% better performance of `--nth` with non-regex delimiters
+- Fixed invalid handling of `hidden` property of `--preview-window`
+
+0.13.3
+------
+- Fixed duplicate rendering of the last line in preview window
+
+0.13.2
+------
+- Fixed race condition where preview window is not properly cleared
+
+0.13.1
+------
+- Fixed UI issue with large `--preview` output with many ANSI codes
+
+0.13.0
+------
+- Added preview feature
+    - `--preview CMD`
+    - `--preview-window POS[:SIZE][:hidden]`
+- `{}` in execute action is now replaced to the single-quoted (instead of
+  double-quoted) string of the current line
+- Fixed to ignore control characters for bracketed paste mode
+
+0.12.2
+------
+
+- 256-color capability detection does not require `256` in `$TERM`
+- Added `print-query` action
+- More named keys for binding; <kbd>F1</kbd> ~ <kbd>F10</kbd>,
+  <kbd>ALT-/</kbd>, <kbd>ALT-space</kbd>, and <kbd>ALT-enter</kbd>
+- Added `jump` and `jump-accept` actions that implement [EasyMotion][em]-like
+  movement
+  ![][jump]
+
+[em]: https://github.com/easymotion/vim-easymotion
+[jump]: https://cloud.githubusercontent.com/assets/700826/15367574/b3999dc4-1d64-11e6-85da-28ceeb1a9bc2.png
+
+0.12.1
+------
+
+- Ranking algorithm introduced in 0.12.0 is now universally applied
+- Fixed invalid cache reference in exact mode
+- Fixes and improvements in Vim plugin and shell extensions
+
+0.12.0
+------
+
+- Enhanced ranking algorithm
+- Minor bug fixes
+
+0.11.4
+------
+
+- Added `--hscroll-off=COL` option (default: 10) (#513)
+- Some fixes in Vim plugin and shell extensions
+
+0.11.3
+------
+
+- Graceful exit on SIGTERM (#482)
+- `$SHELL` instead of `sh` for `execute` action and `$FZF_DEFAULT_COMMAND` (#481)
+- Changes in fuzzy completion API
+    - [`_fzf_compgen_{path,dir}`](https://github.com/junegunn/fzf/commit/9617647)
+    - [`_fzf_complete_COMMAND_post`](https://github.com/junegunn/fzf/commit/8206746)
+      for post-processing
+
+0.11.2
+------
+
+- `--tiebreak` now accepts comma-separated list of sort criteria
+    - Each criterion should appear only once in the list
+    - `index` is only allowed at the end of the list
+    - `index` is implicitly appended to the list when not specified
+    - Default is `length` (or equivalently `length,index`)
+- `begin` criterion will ignore leading whitespaces when calculating the index
+- Added `toggle-in` and `toggle-out` actions
+    - Switch direction depending on `--reverse`-ness
+    - `export FZF_DEFAULT_OPTS="--bind tab:toggle-out,shift-tab:toggle-in"`
+- Reduced the initial delay when `--tac` is not given
+    - fzf defers the initial rendering of the screen up to 100ms if the input
+      stream is ongoing to prevent unnecessary redraw during the initial
+      phase. However, 100ms delay is quite noticeable and might give the
+      impression that fzf is not snappy enough. This commit reduces the
+      maximum delay down to 20ms when `--tac` is not specified, in which case
+      the input list quickly fills the entire screen.
+
 0.11.1
 ------
 
